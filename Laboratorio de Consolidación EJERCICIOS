@@ -1,0 +1,171 @@
+Ejercicio 1: Detección de Patrones
+Análisis de Árboles de Llamadas:
+
+Función A (Tribonacci): misterio_A(n-1) + misterio_A(n-2) + misterio_A(n-3)
+
+Veredicto: SÍ necesita DP.
+
+¿Por qué? Tiene subproblemas superpuestos. Por ejemplo, para calcular A(4) necesitas A(2), y para calcular A(3) (que es parte de A(4)) vuelves a necesitar A(2). Se repite mucho trabajo.
+
+Función B (Suma) y C (Factorial):
+
+Veredicto: NO necesitan DP.
+
+¿Por qué? Son recursiones lineales simples. f(n) solo llama a f(n-1) una vez. El árbol es una línea recta hacia abajo, no hay ramas que se crucen o repitan.
+
+Ejercicio 2: Transformación Guiada
+Paso 1: Versión Ingenua (Recursiva)
+
+Python
+
+def formas_ingenuo(n):
+    # Casos base
+    if n <= 0: return 0 # Ajuste lógico: si no hay escalones, no hay formas (o 1 si n=0 es 'no hacer nada')
+    if n == 1: return 1
+    if n == 2: return 2
+    
+    # Tu código aquí:
+    # Para llegar a N, pude haber venido de N-1 (dando un paso de 1)
+    # o de N-2 (dando un paso de 2).
+
+Paso 3: Agrega Memoización (Top-Down)
+
+def formas_memo(n, memo={}):
+    # Casos base
+    if n <= 0: return 0
+    if n == 1: return 1
+    if n == 2: return 2
+    
+    # ¿Ya lo calculé antes?
+    if n in memo:
+        return memo[n]
+    
+    # Calcularlo y guardarlo
+    resultado = formas_memo(n-1, memo) + formas_memo(n-2, memo)
+    memo[n] = resultado
+    return resultado
+Paso 4: Convierte a Bottom-Up (Tabla)
+
+def formas_tabla(n):
+    if n <= 1: return 1
+    
+    # Crear tabla
+    dp = [0] * (n + 1)
+    
+    # Casos base
+    dp[1] = 1
+    dp[2] = 2 # Asumiendo que n=2 tiene 2 formas (1+1, 2)
+    
+    # Llenar tabla iterativamente
+    for i in range(3, n + 1):
+        # La fórmula es la misma: suma de los dos anteriores
+        dp[i] = dp[i-1] + dp[i-2]
+    
+    return dp[n]
+
+Ejercicio 3: Problema Nuevo (Cambio de Monedas)
+Paso 1: Casos Manuales (Completando la tabla)
+
+n=3: 3 (1 moneda) → Total: 1
+
+n=4: 4 (1 moneda) → Total: 1
+
+n=5: 4 + 1 (2 monedas) → Total: 2
+
+n=6: 3 + 3 (2 monedas) → Total: 2 (Nota: 4+1+1 serían 3 monedas, por eso 3+3 es mejor).
+
+Paso 3: Código DP Completado
+
+def min_monedas(n, monedas=[1,3,4]):
+    if n == 0: return 0
+    if n < 0: return float('inf')
+    
+    dp = [float('inf')] * (n + 1)
+    dp[0] = 0 
+    
+    for i in range(1, n + 1):
+        for moneda in monedas:
+            if i >= moneda:
+                # Tu código aquí:
+                # Si uso esta moneda, el costo es 1 (la moneda actual)
+                # más el costo de resolver el monto restante (i - moneda)
+                costo_actual = 1 + dp[i - moneda]
+                
+                # Nos quedamos con el mínimo entre lo que ya teníamos y el nuevo costo
+                dp[i] = min(dp[i], costo_actual)
+    
+    return dp[n] if dp[n] != float('inf') else -1
+
+Ejercicio 4: Debugging DP
+Análisis de Errores:
+
+Error 1: dp = [0] * n. Si n=5, el array tiene índices 0,1,2,3,4. Si intentas acceder a dp[5], dará error. Corrección: dp = [0] * (n + 1).
+
+Error 2: range(2, n). En Python el límite superior no se incluye. Si n=5, el loop llega hasta 4. Corrección: range(2, n + 1).
+
+Error 3: No hay manejo si n < 2. Si pides fib(0), el código intenta asignar dp[1] y falla.
+
+Código Corregido:
+
+def fibonacci_dp_correcto(n):
+    # Manejo de casos borde
+    if n <= 1: return n
+    
+    # Corrección tamaño array
+    dp = [0] * (n + 1)
+    
+    # Inicialización
+    dp[0] = 0
+    dp[1] = 1
+    
+    # Corrección del rango del bucle
+    for i in range(2, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]
+        
+    return dp[n]
+Ejercicio 5: Para Casa (Mini-Proyecto)
+Te recomiendo hacer el 1. Salto de Ranas, ya que es una extensión muy directa del Ejercicio 2.
+
+Lógica (Pista): En lugar de mirar solo 2 pasos atrás (i-1 y i-2), la rana ahora puede saltar desde 3 lugares: dp[i] = dp[i-1] + dp[i-2] + dp[i-3]
+
+¡Listo! Con esto tienes el laboratorio resuelto al 100%.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    return formas_ingenuo(n-1) + formas_ingenuo(n-2)
