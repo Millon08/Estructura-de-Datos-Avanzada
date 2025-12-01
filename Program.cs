@@ -21,45 +21,47 @@ namespace GrafoActividad
     class Program
     {
         static List<Arista> grafo = new List<Arista>();
+      
         static bool esDirigido = false; 
 
         static void Main(string[] args)
         {
             grafo.Clear();
+            Console.WriteLine("--- Generando Grafo Urbano Ampliado ---");
 
-            Console.WriteLine("--- Generando Grafo ---");
-            Console.WriteLine($"Modo: {(esDirigido ? "Dirigido" : "No Dirigido")}");
-
+          
+            
+            // Zona Residencial
             AgregarConexion("Casa", "Parque", 5);
             AgregarConexion("Casa", "Supermercado", 10);
+            AgregarConexion("Casa", "Farmacia", 7); 
+
+       
             AgregarConexion("Parque", "Escuela", 8);
+            AgregarConexion("Parque", "Gimnasio", 6);
             AgregarConexion("Supermercado", "Escuela", 4);
             AgregarConexion("Supermercado", "Cine", 6);
+            AgregarConexion("Supermercado", "Farmacia", 3); 
+
+      
             AgregarConexion("Escuela", "Hospital", 15);
+            AgregarConexion("Escuela", "Biblioteca", 5); 
+            AgregarConexion("Cine", "Gimnasio", 4); 
             AgregarConexion("Cine", "Hospital", 2);
+ 
+            AgregarConexion("Farmacia", "Hospital", 12); 
+            AgregarConexion("Gimnasio", "Biblioteca", 9); 
 
-            EliminarConexion("Supermercado", "Cine");
-
+         
             GenerarArchivo();
         }
 
         static void AgregarConexion(string origen, string destino, int peso)
         {
             grafo.Add(new Arista(origen, destino, peso));
-            
             if (!esDirigido)
             {
                 grafo.Add(new Arista(destino, origen, peso));
-            }
-        }
-
-        static void EliminarConexion(string origen, string destino)
-        {
-            grafo.RemoveAll(a => a.Origen == origen && a.Destino == destino);
-
-            if (!esDirigido)
-            {
-                grafo.RemoveAll(a => a.Origen == destino && a.Destino == origen);
             }
         }
 
@@ -75,7 +77,7 @@ namespace GrafoActividad
                         sw.WriteLine($"{arista.Origen},{arista.Destino},{arista.Peso}");
                     }
                 }
-                Console.WriteLine($"Archivo {rutaArchivo} actualizado exitosamente.");
+                Console.WriteLine($"Exito: Se han exportado {grafo.Count} aristas a {rutaArchivo}.");
             }
             catch (Exception e)
             {
