@@ -1,0 +1,12 @@
+Casa,Parque,5
+Parque,Casa,5
+Casa,Supermercado,10
+Supermercado,Casa,10
+Parque,Escuela,8
+Escuela,Parque,8
+Supermercado,Escuela,4
+Escuela,Supermercado,4
+Escuela,Hospital,15
+Hospital,Escuela,15
+Cine,Hospital,2
+Hospital,Cine,2
