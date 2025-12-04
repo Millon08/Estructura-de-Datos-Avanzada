@@ -1,0 +1,126 @@
+1. Código del Estudiante (Con Error Lógico)
+class GraphMST:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.edges = []
+
+    def add_edge(self, u, v, w):
+        self.edges.append([u, v, w])
+
+    # Find con path compression (Correcto)
+    def find(self, parent, i):
+        if parent[i] == i:
+            return i
+        parent[i] = self.find(parent, parent[i]) 
+        return parent[i]
+
+    # Union by rank (Correcto)
+    def union(self, parent, rank, x, y):
+        xroot = self.find(parent, x)
+        yroot = self.find(parent, y)
+        if rank[xroot] < rank[yroot]:
+            parent[xroot] = yroot
+        elif rank[xroot] > rank[yroot]:
+            parent[yroot] = xroot
+        else:
+            parent[yroot] = xroot
+            rank[xroot] += 1
+
+    def kruskal_mst(self):
+        result = []
+        # El estudiante SÍ ordenó las aristas correctamente esta vez
+        self.edges = sorted(self.edges, key=lambda item: item[2])
+
+        parent = []
+        rank = []
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
+
+        for u, v, w in self.edges:
+            root_u = self.find(parent, u)
+            root_v = self.find(parent, v)
+
+            # ERROR CRÍTICO AQUÍ:
+            # Compara si los NODOS son diferentes, no si sus RAÍCES son diferentes.
+            if u != v: 
+                result.append([u, v, w])
+                self.union(parent, rank, root_u, root_v)
+                
+        cost = sum([w for u, v, w in result])
+        return result, cost  
+
+
+Grafo de Prueba
+g = GraphMST(3)
+# Un triángulo simple donde todas las aristas pesan lo mismo
+g.add_edge(0, 1, 10)
+g.add_edge(1, 2, 10)
+g.add_edge(0, 2, 10)
+# Resultado Esperado:
+# Para conectar 3 nodos necesitamos 2 aristas.
+# MST debería tener 2 aristas. Costo = 20.
+
+# Resultado Obtenido:
+# El código aceptó: (0,1,10), (1,2,10) Y TAMBIÉN (0,2,10).
+# MST tiene 3 aristas (formó un ciclo). Costo = 30.
+# ¡Incorrecto!
+
+Respuesta de la IA
+1. Identificación del Error El error se encuentra en la línea if u != v:. El estudiante está comprobando si el nodo de origen es distinto al nodo de destino (identidad de nodos), en lugar de comprobar si root_u != root_v (pertenencia al mismo conjunto/conectividad).
+
+2. Explicación del Comportamiento Kruskal debe verificar si dos nodos ya están conectados indirectamente antes de añadir una arista.
+
+Al usar if u != v, la condición casi siempre es verdadera (a menos que haya un "self-loop" o arista de un nodo a sí mismo).
+
+Aunque Union-Find se ejecuta en self.union(...), el if ignora la información que nos da find.
+
+Consecuencia: El algoritmo añade todas las aristas al resultado (siempre que conecten nodos distintos), ignorando si eso crea un ciclo. El código falla en su propósito principal: evitar ciclos.
+
+3. Código Corregido
+def kruskal_mst(self):
+        result = []
+        self.edges = sorted(self.edges, key=lambda item: item[2])
+
+        parent = []
+        rank = []
+        for node in range(self.V):
+            parent.append(node)
+            rank.append(0)
+
+        for u, v, w in self.edges:
+            root_u = self.find(parent, u)
+            root_v = self.find(parent, v)
+
+            # CORRECCIÓN: Comparamos las raíces (representantes de los conjuntos)
+            # Si root_u == root_v, significa que u y v ya están conectados y agregar la arista crea un ciclo.
+            if root_u != root_v: 
+                result.append([u, v, w])
+                self.union(parent, rank, root_u, root_v)
+                
+        cost = sum([w for u, v, w in result])
+        return result, cost
+
+4. Casos de Prueba Adicionales
+
+Estos casos demuestran fallos graves en la lógica de detección de ciclos:
+
+Aristas Paralelas (Multigrafo):
+
+add_edge(0, 1, 5) y add_edge(0, 1, 20).
+
+Comportamiento Erróneo: El código original añadiría ambas aristas porque 0 != 1 en ambos casos, creando un ciclo redundante entre dos nodos.
+
+Ciclo Cuadrado:
+
+4 nodos en forma de cuadrado.
+
+El código erróneo añadiría las 4 aristas del perímetro, cerrando el cuadro (ciclo), cuando debería dejar una abierta (árbol en forma de "U").
+
+Grafo Completo (K4):
+
+4 nodos, todos conectados con todos.
+
+El código erróneo seleccionaría las 6 aristas totales, devolviendo el grafo original completo en lugar de un árbol (que solo debería tener 3 aristas).
+
+
