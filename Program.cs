@@ -4,6 +4,7 @@ using System.IO;
 
 namespace GrafoActividad
 {
+    // Clase simple para representar una conexión
     public class Arista
     {
         public string Origen { get; set; }
@@ -21,44 +22,46 @@ namespace GrafoActividad
     class Program
     {
         static List<Arista> grafo = new List<Arista>();
-      
+        // false = Grafo No Dirigido (las calles son de doble sentido)
         static bool esDirigido = false; 
 
         static void Main(string[] args)
         {
             grafo.Clear();
-            Console.WriteLine("--- Generando Grafo Urbano Ampliado ---");
+            Console.WriteLine("--- Generando Grafo Urbano (Avance 2) ---");
 
-          
+            // --- CARGA DE DATOS (Mínimo 12 aristas únicas) ---
             
             // Zona Residencial
             AgregarConexion("Casa", "Parque", 5);
             AgregarConexion("Casa", "Supermercado", 10);
-            AgregarConexion("Casa", "Farmacia", 7); 
+            AgregarConexion("Casa", "Farmacia", 7);
 
-       
+            // Zona Comercial y Educativa
             AgregarConexion("Parque", "Escuela", 8);
             AgregarConexion("Parque", "Gimnasio", 6);
             AgregarConexion("Supermercado", "Escuela", 4);
             AgregarConexion("Supermercado", "Cine", 6);
-            AgregarConexion("Supermercado", "Farmacia", 3); 
+            AgregarConexion("Supermercado", "Farmacia", 3);
 
-      
+            // Zona Servicios y Salud
             AgregarConexion("Escuela", "Hospital", 15);
-            AgregarConexion("Escuela", "Biblioteca", 5); 
-            AgregarConexion("Cine", "Gimnasio", 4); 
+            AgregarConexion("Escuela", "Biblioteca", 5);
+            AgregarConexion("Cine", "Gimnasio", 4);
             AgregarConexion("Cine", "Hospital", 2);
- 
-            AgregarConexion("Farmacia", "Hospital", 12); 
-            AgregarConexion("Gimnasio", "Biblioteca", 9); 
+            
+            // Conexiones periféricas para dar consistencia
+            AgregarConexion("Farmacia", "Hospital", 12);
+            AgregarConexion("Gimnasio", "Biblioteca", 9);
 
-         
             GenerarArchivo();
         }
 
         static void AgregarConexion(string origen, string destino, int peso)
         {
             grafo.Add(new Arista(origen, destino, peso));
+            
+            // Si es NO dirigido, agregamos el regreso automáticamente
             if (!esDirigido)
             {
                 grafo.Add(new Arista(destino, origen, peso));
@@ -77,7 +80,7 @@ namespace GrafoActividad
                         sw.WriteLine($"{arista.Origen},{arista.Destino},{arista.Peso}");
                     }
                 }
-                Console.WriteLine($"Exito: Se han exportado {grafo.Count} aristas a {rutaArchivo}.");
+                Console.WriteLine($"Exito: Se exportaron {grafo.Count} conexiones a {rutaArchivo}.");
             }
             catch (Exception e)
             {
